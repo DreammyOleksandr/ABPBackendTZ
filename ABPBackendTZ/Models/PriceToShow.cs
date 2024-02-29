@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ABPBackendTZ.Models;
 
-public class PriceChange
+public class PriceToShow
 {
     [Key] public int Id { get; set; }
     public decimal Value {get; set;}

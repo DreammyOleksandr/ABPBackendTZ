@@ -9,8 +9,9 @@ public class ApplicationDbContext : DbContext
     {
     }
 
+    public DbSet<Device> Devices { get; set; }
     public DbSet<ButtonColor> ButtonColors { get; set; }
-    public DbSet<PriceChange> PriceChanges { get; set; }
+    public DbSet<PriceToShow> PricesToShow { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -29,7 +30,7 @@ public class ApplicationDbContext : DbContext
             HEX = "#0000FF",
         });
 
-        builder.Entity<PriceChange>().HasData(new
+        builder.Entity<PriceToShow>().HasData(new
         {
             Id = 1,
             Value = 10M,

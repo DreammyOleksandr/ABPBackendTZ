@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ABPBackendTZ.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240229222231_SeedingDb")]
-    partial class SeedingDb
+    [Migration("20240229235044_ReseedDb")]
+    partial class ReseedDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -58,7 +58,27 @@ namespace ABPBackendTZ.Migrations
                         });
                 });
 
-            modelBuilder.Entity("ABPBackendTZ.Models.PriceChange", b =>
+            modelBuilder.Entity("ABPBackendTZ.Models.Device", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ButtonColorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PriceToShowId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ButtonColorId");
+
+                    b.HasIndex("PriceToShowId");
+
+                    b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("ABPBackendTZ.Models.PriceToShow", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -74,7 +94,7 @@ namespace ABPBackendTZ.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PriceChanges");
+                    b.ToTable("PricesToShow");
 
                     b.HasData(
                         new
@@ -101,6 +121,25 @@ namespace ABPBackendTZ.Migrations
                             Percentage = 0.1f,
                             Value = 5m
                         });
+                });
+
+            modelBuilder.Entity("ABPBackendTZ.Models.Device", b =>
+                {
+                    b.HasOne("ABPBackendTZ.Models.ButtonColor", "ButtonColor")
+                        .WithMany()
+                        .HasForeignKey("ButtonColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ABPBackendTZ.Models.PriceToShow", "PriceToShow")
+                        .WithMany()
+                        .HasForeignKey("PriceToShowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ButtonColor");
+
+                    b.Navigation("PriceToShow");
                 });
 #pragma warning restore 612, 618
         }

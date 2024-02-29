@@ -7,7 +7,7 @@
 namespace ABPBackendTZ.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedingDb : Migration
+    public partial class ReseedDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,7 +26,7 @@ namespace ABPBackendTZ.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PriceChanges",
+                name: "PricesToShow",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -36,7 +36,32 @@ namespace ABPBackendTZ.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PriceChanges", x => x.Id);
+                    table.PrimaryKey("PK_PricesToShow", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Devices",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ButtonColorId = table.Column<int>(type: "int", nullable: false),
+                    PriceToShowId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Devices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Devices_ButtonColors_ButtonColorId",
+                        column: x => x.ButtonColorId,
+                        principalTable: "ButtonColors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Devices_PricesToShow_PriceToShowId",
+                        column: x => x.PriceToShowId,
+                        principalTable: "PricesToShow",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -50,7 +75,7 @@ namespace ABPBackendTZ.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "PriceChanges",
+                table: "PricesToShow",
                 columns: new[] { "Id", "Percentage", "Value" },
                 values: new object[,]
                 {
@@ -59,16 +84,29 @@ namespace ABPBackendTZ.Migrations
                     { 3, 0.05f, 50m },
                     { 4, 0.1f, 5m }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Devices_ButtonColorId",
+                table: "Devices",
+                column: "ButtonColorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Devices_PriceToShowId",
+                table: "Devices",
+                column: "PriceToShowId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Devices");
+
+            migrationBuilder.DropTable(
                 name: "ButtonColors");
 
             migrationBuilder.DropTable(
-                name: "PriceChanges");
+                name: "PricesToShow");
         }
     }
 }
