@@ -1,4 +1,6 @@
 using ABPBackendTZ;
+using ABPBackendTZ.Repository;
+using ABPBackendTZ.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
+builder.Services.AddScoped<IButtonColorRepository, ButtonColorRepository>();
+builder.Services.AddScoped<IPriceToShowRepository, PriceToShowRepository>();
 
 var app = builder.Build();
 
