@@ -12,7 +12,7 @@ public class PriceToShowRepository : IPriceToShowRepository
         _context = context;
     }
 
-    public async Task<PriceToShow> GetById(int id) => await _context.Set<PriceToShow>().FindAsync(id);
+    public async Task<PriceToShow> GetById(int? id) => await _context.Set<PriceToShow>().FindAsync(id);
     public async Task<IEnumerable<PriceToShow>> GetAll() => await _context.Set<PriceToShow>().ToListAsync();
     
     public async Task Add(PriceToShow priceToShow)

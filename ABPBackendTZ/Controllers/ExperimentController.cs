@@ -1,6 +1,6 @@
 using ABPBackendTZ.Models;
+using ABPBackendTZ.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ABPBackendTZ.Controllers
 {
@@ -9,13 +9,20 @@ namespace ABPBackendTZ.Controllers
     public class ExperimentController : ControllerBase
     {
         private readonly APIResponse _response = new();
-        private readonly ApplicationDbContext _dbContext;
         private const string GetButtonColorTemplate = "button-color";
         private const string GetPriceTemplate = "price";
+        private readonly IDeviceRepository _deviceRepository;
+        private readonly IButtonColorRepository _buttonColorRepository;
+        private readonly IPriceToShowRepository _priceToShowRepository;
 
-        public ExperimentController(ApplicationDbContext dbContext)
+        public ExperimentController(
+            IDeviceRepository deviceRepository,
+            IButtonColorRepository buttonColorRepository,
+            IPriceToShowRepository priceToShowRepository)
         {
-            _dbContext = dbContext;
+            _priceToShowRepository = priceToShowRepository;
+            _buttonColorRepository = buttonColorRepository;
+            _deviceRepository = deviceRepository;
         }
 
         [HttpGet(GetButtonColorTemplate)]
@@ -26,8 +33,7 @@ namespace ABPBackendTZ.Controllers
             {
                 if (String.IsNullOrEmpty(device_token)) return BadRequest();
                 //Знаходимо девайс в БД для подальших дій (включаючи ButtonColor)
-                Device device = await _dbContext.Devices.Include(nameof(ButtonColor))
-                    .FirstOrDefaultAsync(_ => _.Token == device_token);
+                Device device = await _deviceRepository.GetByToken(device_token, true, false);
                 if (device is null) // Якщо девайсу в БД не знайдено, то створюємо новий і видаємо йому кнопку з випадковим кольором.
                 {
                     device = new Device();
@@ -40,14 +46,12 @@ namespace ABPBackendTZ.Controllers
 
                      Варіант роботи з Індексами запобігає подібним помилкам.
                      */
-                    var ButtonColorIds = _dbContext.ButtonColors.Select(_ => _.Id).ToList();
+                    var ButtonColorIds = _buttonColorRepository.GetAll().Result.Select(_ => _.Id).ToList();
                     device.ButtonColorId = GetRandomValueFromList(ButtonColorIds);
 
-                    await _dbContext.Devices.AddAsync(device); // Додаємо девайс до БД і зберігаємо зміни.
-                    await _dbContext.SaveChangesAsync();
+                    await _deviceRepository.Add(device); // Додаємо девайс до БД і зберігаємо зміни.
 
-                    _response.Value = _dbContext.ButtonColors
-                        .FirstOrDefaultAsync(_ => _.Id == device.ButtonColorId).Result.HEX;
+                    _response.Value = _buttonColorRepository.GetById(device.ButtonColorId).Result.HEX;
                     return Ok(_response); // Видаємо відповідь
                 }
 
@@ -59,13 +63,11 @@ namespace ABPBackendTZ.Controllers
                 }
                 else // Якщо девайс записаний до БД, але не має ButtonColor, тоді надємо значення в це поле і оновлюємо Device
                 {
-                    var ButtonColorIds = _dbContext.ButtonColors.Select(_ => _.Id).ToList();
+                    var ButtonColorIds = _buttonColorRepository.GetAll().Result.Select(_ => _.Id).ToList();
                     device.ButtonColorId = GetRandomValueFromList(ButtonColorIds);
+                    await _deviceRepository.Update(device);
 
-                    _dbContext.Devices.Update(device);
-                    await _dbContext.SaveChangesAsync();
-                    _response.Value = _dbContext.ButtonColors
-                        .FirstOrDefaultAsync(_ => _.Id == device.ButtonColorId).Result.HEX;
+                    _response.Value = _buttonColorRepository.GetById(device.ButtonColorId).Result.HEX;
                     return Ok(_response);
                 }
             }
@@ -84,22 +86,19 @@ namespace ABPBackendTZ.Controllers
             {
                 if (String.IsNullOrEmpty(device_token)) return BadRequest();
                 //Знаходимо девайс в БД для подальших дій (включаючи PriceToShow)
-                Device device = await _dbContext.Devices.Include(nameof(PriceToShow))
-                    .FirstOrDefaultAsync(_ => _.Token == device_token);
+                Device device = await _deviceRepository.GetByToken(device_token, false, true);
                 if (device is null) // Якщо девайсу в БД не знайдено, то створюємо новий і видаємо йому ціну з визначеною вірогідністю.
                 {
-                    device = new Device();
+                    device = new();
                     device.Token = device_token;
 
-                    var PriceToShowIds = _dbContext.PricesToShow.Select(_ => _.Id).ToList();
-                    var Probabilities = _dbContext.PricesToShow.Select(_ => _.Percentage).ToList();
+                    var PriceToShowIds = _priceToShowRepository.GetAll().Result.Select(_ => _.Id).ToList();
+                    var Probabilities = _priceToShowRepository.GetAll().Result.Select(_ => _.Percentage).ToList();
                     device.PriceToShowId = GetRandomValueFromListWithProbability(PriceToShowIds, Probabilities);
 
-                    await _dbContext.Devices.AddAsync(device); // Додаємо девайс до БД і зберігаємо зміни.
-                    await _dbContext.SaveChangesAsync();
+                    await _deviceRepository.Add(device); // Додаємо девайс до БД і зберігаємо зміни.
 
-                    _response.Value = _dbContext.PricesToShow
-                        .FirstOrDefaultAsync(_ => _.Id == device.PriceToShowId).Result.Value.ToString();
+                    _response.Value = _priceToShowRepository.GetById(device.PriceToShowId).Result.Value.ToString();
                     return Ok(_response);
                 }
 
@@ -111,15 +110,13 @@ namespace ABPBackendTZ.Controllers
                 }
                 else // Якщо девайс записаний до БД, але не має PriceToShow, тоді надємо значення в це поле і оновлюємо Device
                 {
-                    var PriceToShowIds = _dbContext.PricesToShow.Select(_ => _.Id).ToList();
-                    var Probabilities = _dbContext.PricesToShow.Select(_ => _.Percentage).ToList();
+                    var PriceToShowIds = _priceToShowRepository.GetAll().Result.Select(_ => _.Id).ToList();
+                    var Probabilities = _priceToShowRepository.GetAll().Result.Select(_ => _.Percentage).ToList();
                     device.PriceToShowId = GetRandomValueFromListWithProbability(PriceToShowIds, Probabilities);
 
-                    _dbContext.Devices.Update(device);
-                    await _dbContext.SaveChangesAsync();
+                    await _deviceRepository.Update(device);
 
-                    _response.Value = _dbContext.PricesToShow
-                        .FirstOrDefaultAsync(_ => _.Id == device.PriceToShowId).Result.Value.ToString();
+                    _response.Value = _priceToShowRepository.GetById(device.PriceToShowId).Result.Value.ToString();
                     return Ok(_response);
                 }
             }
@@ -130,7 +127,7 @@ namespace ABPBackendTZ.Controllers
             }
         }
 
-        private int GetRandomValueFromList(List<int> list)
+        private int GetRandomValueFromList(List<int>? list)
         {
             /* Ця функція описує отримання значення з листа при однаковій вірогідності отримання значень із нього,
             тому тут використовується звичайний клас Random. Ця функція дуже проста, але вона виділена задля декомпозиції
@@ -141,7 +138,7 @@ namespace ABPBackendTZ.Controllers
             return list[value];
         }
 
-        private int? GetRandomValueFromListWithProbability(List<int> list, List<float> probabilities)
+        private int? GetRandomValueFromListWithProbability(List<int>? list, List<float>? probabilities)
         {
             /* Ця функція описує отримання значення з листа при різній вірогідності отримання значень із нього.
              Ця функція дуже проста, але вона виділена задля декомпозиції та запобіганню повторень коду.
@@ -155,6 +152,7 @@ namespace ABPBackendTZ.Controllers
                 cumulativeProbability += probabilities[i];
                 if (randomNumber < cumulativeProbability) return list[i];
             }
+
             return null;
         }
     }

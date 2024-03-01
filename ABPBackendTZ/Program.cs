@@ -9,6 +9,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -16,7 +18,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDeviceRepository, DeviceRepository>();
 builder.Services.AddScoped<IButtonColorRepository, ButtonColorRepository>();
 builder.Services.AddScoped<IPriceToShowRepository, PriceToShowRepository>();
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

@@ -6,14 +6,14 @@ namespace ABPBackendTZ.Repository;
 
 public class ButtonColorRepository : IButtonColorRepository
 {
-    private readonly DbContext _context;
+    private readonly ApplicationDbContext _context;
 
-    public ButtonColorRepository(DbContext context)
+    public ButtonColorRepository(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    public async Task<ButtonColor> GetById(int id) => await _context.Set<ButtonColor>().FindAsync(id);
+    public async Task<ButtonColor> GetById(int? id) => await _context.Set<ButtonColor>().FindAsync(id);
     public async Task<IEnumerable<ButtonColor>> GetAll() => await _context.Set<ButtonColor>().ToListAsync();
 
     public async Task Add(ButtonColor buttonColor)

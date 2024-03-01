@@ -13,7 +13,7 @@ public class DeviceRepository : IDeviceRepository
         _context = context;
     }
 
-    public async Task<Device> GetByToken(string token, bool includeButtonColor, bool includePriceToShow)
+    public async Task<Device> GetByToken(string token, bool includeButtonColor = false, bool includePriceToShow = false)
     {
         var query = _context.Devices.AsQueryable();
 
