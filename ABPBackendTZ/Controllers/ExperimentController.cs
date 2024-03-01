@@ -33,7 +33,7 @@ namespace ABPBackendTZ.Controllers
             {
                 if (String.IsNullOrEmpty(device_token)) return BadRequest();
                 //Знаходимо девайс в БД для подальших дій (включаючи ButtonColor)
-                Device device = await _deviceRepository.GetByToken(device_token, true, false);
+                Device device = await _deviceRepository.GetByToken(device_token, nameof(ButtonColor));
                 if (device is null) // Якщо девайсу в БД не знайдено, то створюємо новий і видаємо йому кнопку з випадковим кольором.
                 {
                     device = new Device();
@@ -86,7 +86,7 @@ namespace ABPBackendTZ.Controllers
             {
                 if (String.IsNullOrEmpty(device_token)) return BadRequest();
                 //Знаходимо девайс в БД для подальших дій (включаючи PriceToShow)
-                Device device = await _deviceRepository.GetByToken(device_token, false, true);
+                Device device = await _deviceRepository.GetByToken(device_token, nameof(PriceToShow));
                 if (device is null) // Якщо девайсу в БД не знайдено, то створюємо новий і видаємо йому ціну з визначеною вірогідністю.
                 {
                     device = new();

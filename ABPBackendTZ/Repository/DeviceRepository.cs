@@ -13,18 +13,17 @@ public class DeviceRepository : IDeviceRepository
         _context = context;
     }
 
-    public async Task<Device> GetByToken(string token, bool includeButtonColor = false, bool includePriceToShow = false)
+    public async Task<Device> GetByToken(string token, string? includeProperties = null)
     {
         var query = _context.Devices.AsQueryable();
-
-        if (includeButtonColor)
+        
+        if (includeProperties != null)
         {
-            query = query.Include(_ => _.ButtonColor);
-        }
-
-        if (includePriceToShow)
-        {
-            query = query.Include(_ => _.PriceToShow);
+            foreach (var includeProp in includeProperties.Split(new char[] { ',' },
+                         StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProp);
+            }
         }
 
         return await query.FirstOrDefaultAsync(_ => _.Token == token);
