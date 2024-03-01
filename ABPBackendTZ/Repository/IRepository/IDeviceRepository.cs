@@ -4,8 +4,8 @@ namespace ABPBackendTZ.Repository.IRepository;
 
 public interface IDeviceRepository
 {
-    Device GetByToken(string token);
-    IEnumerable<Device> GetAll();
-    void Add(Device device);
-    void Update(Device device);
+    Task<Device> GetByToken(string token, bool includeButtonColor, bool includePriceToShow);
+    Task<IEnumerable<Device>> GetAll();
+    Task Add(Device device);
+    Task Update(Device device);
 }

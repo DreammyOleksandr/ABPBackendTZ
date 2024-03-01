@@ -6,25 +6,40 @@ namespace ABPBackendTZ.Repository;
 
 public class DeviceRepository : IDeviceRepository
 {
-    private readonly DbContext _context;
+    private readonly ApplicationDbContext _context;
 
-    public DeviceRepository(DbContext context)
+    public DeviceRepository(ApplicationDbContext context)
     {
         _context = context;
     }
 
-    public Device GetByToken(string token) => _context.Set<Device>().Find(token);
-    public IEnumerable<Device> GetAll() => _context.Set<Device>().ToList();
+    public async Task<Device> GetByToken(string token, bool includeButtonColor, bool includePriceToShow)
+    {
+        var query = _context.Devices.AsQueryable();
+
+        if (includeButtonColor)
+        {
+            query = query.Include(_ => _.ButtonColor);
+        }
+
+        if (includePriceToShow)
+        {
+            query = query.Include(_ => _.PriceToShow);
+        }
+
+        return await query.FirstOrDefaultAsync(_ => _.Token == token);
+    }
+    public async Task<IEnumerable<Device>> GetAll() => await _context.Set<Device>().ToListAsync();
     
-    public void Add(Device device)
+    public async Task Add(Device device)
     {
         _context.Set<Device>().Add(device);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void Update(Device device)
+    public async Task Update(Device device)
     {
         _context.Entry(device).State = EntityState.Modified;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }    
 }

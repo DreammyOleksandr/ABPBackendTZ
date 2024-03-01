@@ -4,8 +4,8 @@ namespace ABPBackendTZ.Repository.IRepository;
 
 public interface IButtonColorRepository
 {
-    ButtonColor GetById(int id);
-    IEnumerable<ButtonColor> GetAll();
-    void Add(ButtonColor buttonColor);
-    void Update(ButtonColor buttonColor);
+    Task<ButtonColor> GetById(int id);
+    Task<IEnumerable<ButtonColor>> GetAll();
+    Task Add(ButtonColor buttonColor);
+    Task Update(ButtonColor buttonColor);
 }

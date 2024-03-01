@@ -13,18 +13,18 @@ public class ButtonColorRepository : IButtonColorRepository
         _context = context;
     }
 
-    public ButtonColor GetById(int id) => _context.Set<ButtonColor>().Find(id);
-    public IEnumerable<ButtonColor> GetAll() => _context.Set<ButtonColor>().ToList();
+    public async Task<ButtonColor> GetById(int id) => await _context.Set<ButtonColor>().FindAsync(id);
+    public async Task<IEnumerable<ButtonColor>> GetAll() => await _context.Set<ButtonColor>().ToListAsync();
 
-    public void Add(ButtonColor buttonColor)
+    public async Task Add(ButtonColor buttonColor)
     {
         _context.Set<ButtonColor>().Add(buttonColor);
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 
-    public void Update(ButtonColor buttonColor)
+    public async Task Update(ButtonColor buttonColor)
     {
         _context.Entry(buttonColor).State = EntityState.Modified;
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
     }
 }
