@@ -3,4 +3,15 @@
 	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/FiltersState/=CodeStyle/@EntryIndexedValue">Off</s:String>
 	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/FiltersState/=NamingFilter/@EntryIndexedValue">Off</s:String>
 	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/FiltersState/=SpellingFilter/@EntryIndexedValue">Off</s:String>
-	<s:Boolean x:Key="/Default/Environment/InlayHints/GeneralInlayHintsOptions/EnableInlayHints/@EntryValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/Environment/InlayHints/GeneralInlayHintsOptions/EnableInlayHints/@EntryValue">False</s:Boolean>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5515c5b1_002D3451_002D4471_002Db4eb_002D750ce356b6bd/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GetButtonColor_ShouldReturn_ButtonColor_And_ButtonColorTemplate" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::B6F8A1EF-2C43-4B6B-8533-51FFA9912F11::net7.0::ABPBackendTZUnitTests.ExperimentControllerTests.GetButtonColor_ShouldReturn_ButtonColor_And_ButtonColorTemplate&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ffa0010c_002Da61f_002D4b81_002Da6f9_002De356ad82d351/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetButtonColor_ShouldReturn_ButtonColor_And_ButtonColorTemplate #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::B6F8A1EF-2C43-4B6B-8533-51FFA9912F11::net7.0::ABPBackendTZ.Tests.ExperimentControllerTests.GetButtonColor_ReturnsBadRequest_WhenDeviceTokenIsNullOrEmpty&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::B6F8A1EF-2C43-4B6B-8533-51FFA9912F11::net7.0::ABPBackendTZ.Tests.ExperimentControllerTests.GetButtonColor_ReturnsOkResult_WhenDeviceExists&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
