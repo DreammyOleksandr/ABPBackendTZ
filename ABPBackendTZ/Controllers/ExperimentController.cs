@@ -33,11 +33,18 @@ namespace ABPBackendTZ.Controllers
                     device = new Device();
                     device.Token = device_token;
 
+                    // Тут ми отримуємо всі Id від ButtonColors для того, що б працювати з індексами, а не значеннями, бо це запобігає подібній помилці:
+                    /*
+                     якщо б ми просто присвоювали випадкове значкеея до ButtonColorId, то можлива була б подібна ситуація:
+                     Ids: [1, 2, 3, 7, 10] і якщо б Random просто шукав значення, а не індекс, то ми б отримали наприклад число 6, якого немає в Листі і отримували б помилку.
+                     
+                     Варіант роботи з Індексами запобігає подібним помилкам.
+                     */
                     var ButtonColorIds = _dbContext.ButtonColors.Select(_ => _.Id).ToList();
                     device.ButtonColorId = GetRandomValueFromList(ButtonColorIds);
 
-                    await _dbContext.Devices.AddAsync(device); // Додаємо девайс до БД
-                    await _dbContext.SaveChangesAsync(); // Зберігаємо зміни
+                    await _dbContext.Devices.AddAsync(device); // Додаємо девайс до БД і зберігаємо зміни.
+                    await _dbContext.SaveChangesAsync(); 
 
                     _response.Value = _dbContext.ButtonColors
                         .FirstOrDefaultAsync(_ => _.Id == device.ButtonColorId).Result.HEX;
@@ -71,33 +78,50 @@ namespace ABPBackendTZ.Controllers
         }
 
         [HttpGet(GetPriceTemplate)]
-        public IActionResult GetPrice(string? device_token)
+        public async Task<IActionResult> GetPrice(string? device_token)
         {
             _response.Key = GetPriceTemplate;
-            _response.Value = "TestValue";
-            return Ok(_response);
+            try
+            {
+                if (String.IsNullOrEmpty(device_token)) return BadRequest();
+                //Знаходимо девайс в БД для подальших дій (включаючи PriceToShow)
+                Device device = await _dbContext.Devices.Include(nameof(PriceToShow))
+                    .FirstOrDefaultAsync(_ => _.Token == device_token);
+                if (device is null) // Якщо девайсу в БД не знайдено, то створюємо новий і видаємо йому кнопку з випадковим кольором.
+                {
+                    device = new Device();
+                    device.Token = device_token;
+                }
+                return Ok("test");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw e;
+            }
         }
 
         private int GetRandomValueFromList(List<int> list)
         {
             /* Ця функція описує отримання значення з листа при однаковій вірогідності отримання значень із нього,
             тому тут використовується звичайний клас Random. Ця функція дуже проста, але вона виділена задля декомпозиції
-            та запобіганню повторень коду
+            та запобіганню повторень коду.
             */
             Random r = new();
             int value = r.Next(0, list.Count);
             return list[value];
         }
 
-        private string GetRandomValueWithProbability(string[] items, double[] probabilities, double randomNumber)
+        private int? GetRandomValueWithProbability(List<int> list, List<float> probabilities)
         {
+            Random r = new();
+            double randomNumber = r.NextDouble();
             double cumulativeProbability = 0;
-            for (int i = 0; i < items.Length; i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 cumulativeProbability += probabilities[i];
-                if (randomNumber < cumulativeProbability) return items[i];
+                if (randomNumber < cumulativeProbability) return list[i];
             }
-
             return null;
         }
     }
